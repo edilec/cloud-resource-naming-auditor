@@ -1,13 +1,15 @@
 {
   "name": "cloud-resource-naming-auditor",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Check cloud resource names against environment, owner and lifecycle rules.",
   "type": "module",
   "engines": {
     "node": ">=22"
   },
   "scripts": {
-    "test": "node --test"
+    "lint": "node --check src/index.mjs && node --check bin/cloud-resource-naming-auditor.mjs",
+    "test": "node --test",
+    "check": "npm run lint && npm test"
   },
   "license": "MIT",
   "repository": {
