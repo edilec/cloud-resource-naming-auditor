@@ -27,6 +27,13 @@ test('missing owner and unapproved environment markers fail without echoing valu
   const d=inventory();delete d.resources[0].tags.owner;d.resources[1].tags.environment='private-stage';
   const r=auditNames(policy(),d,{now:()=>0});assert.equal(r.status,'fail');assert.deepEqual(r.findings.map(f=>f.ruleId),['owner-missing','environment-invalid']);assert.doesNotMatch(JSON.stringify(r),/private-stage|team-a/);
 });
+test('unusable tag containers are incomplete, while an empty tag object has missing markers',()=>{
+  for(const bad of [undefined,null,[],42,'private-tags']){
+    const d=inventory();if(bad===undefined)delete d.resources[0].tags;else d.resources[0].tags=bad;
+    const r=auditNames(policy(),d,{now:()=>0});assert.equal(r.status,'incomplete');assert.ok(r.findings.some(f=>f.ruleId==='resource-invalid'));assert.ok(!r.findings.some(f=>f.ruleId==='environment-missing'||f.ruleId==='owner-missing'));assert.doesNotMatch(JSON.stringify(r),/private-tags/);
+  }
+  const d=inventory();d.resources[0].tags={};const r=auditNames(policy(),d,{now:()=>0});assert.equal(r.status,'fail');assert.deepEqual(r.findings.map(f=>f.ruleId),['environment-missing','owner-missing']);
+});
 test('unknown service or absent completeness is incomplete, never a pass',()=>{
   const d=inventory();d.resources[0].service='unlisted-service';assert.equal(auditNames(policy(),d,{now:()=>0}).status,'incomplete');
   const p=policy();delete p.complete;assert.equal(auditNames(p,inventory(),{now:()=>0}).status,'incomplete');

@@ -49,10 +49,11 @@ export function auditNames(policy,inventory,{now=()=>performance.now()}={}){
     if(!['aws','aws-cn','aws-us-gov'].includes(item.partition)||typeof item.account!=='string'||!/^\d{12}$/.test(item.account)||typeof item.region!=='string'||!/^[a-z0-9-]{1,32}$/.test(item.region)||!safe(item.name)){
       findings.push(finding('resource-invalid','@inventory',pointer));continue;
     }
+    if(!object(item.tags)){findings.push(finding('resource-invalid','@inventory',`${pointer}/tags`));continue;}
     checked++;
     if(!validName(item.service,item.name))findings.push(finding('name-invalid','@inventory',`${pointer}/name`));
     else {const key=scopeKey(item);if(seen.has(key))findings.push(finding('name-duplicate','@inventory',`${pointer}/name`));else seen.add(key);}
-    const tags=object(item.tags)?item.tags:{};
+    const tags=item.tags;
     if(tags.environment===undefined)findings.push(finding('environment-missing','@inventory',`${pointer}/tags/environment`));
     else if(!environment(tags.environment))findings.push(finding('resource-invalid','@inventory',`${pointer}/tags/environment`));
     else if(!allowed.has(tags.environment))findings.push(finding('environment-invalid','@inventory',`${pointer}/tags/environment`));
