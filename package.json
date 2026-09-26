@@ -1,0 +1,19 @@
+{
+  "name": "cloud-resource-naming-auditor",
+  "version": "1.0.0",
+  "description": "Check cloud resource names against environment, owner and lifecycle rules.",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "lint": "node --check src/index.mjs && node --check bin/cloud-resource-naming-auditor.mjs",
+    "test": "node --test",
+    "check": "npm run lint && npm test"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/edilec/cloud-resource-naming-auditor"
+  }
+}
